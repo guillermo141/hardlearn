@@ -8,6 +8,7 @@ import javafx.geometry.*;
 import javafx.application.Platform;
 import java.io.*;
 import java.net.*;
+import javafx.scene.image.ImageView;
 
 public class App {
 
@@ -90,11 +91,13 @@ public class App {
     }
 
     private VBox buildSidebar() {
-        VBox sb = new VBox(4);
-        sb.setPrefWidth(250);
-        sb.setPadding(new Insets(22, 12, 18, 12));
+        VBox sb = new VBox(15); // Aumentamos espacio entre elementos
+        sb.setPrefWidth(260);
+        sb.setPadding(new Insets(20, 15, 18, 15));
         sb.setStyle("-fx-background-color:#111827; -fx-border-color:#1E2D45; -fx-border-width:0 1 0 0;");
 
+        
+        
         // logo de la imagen
         HBox logo = new HBox(15); // Aumentamos el espacio entre icono y texto
         logo.setAlignment(Pos.CENTER_LEFT);
@@ -107,8 +110,9 @@ public class App {
         // Aumentamos tamaño a 18 y el espacio entre letras (letter-spacing)
         texto.setStyle("-fx-font-family:'Segoe UI Bold', 'Arial'; -fx-font-size: 24; -fx-text-fill:#00D4AA; -fx-letter-spacing: 1px; -fx-effect: dropshadow(gaussian, rgba(0, 212, 170, 0.5), 10, 0, 0, 0);");
 
-        logo.getChildren().addAll(icono, texto);
-        sb.getChildren().add(logo);    
+        logo.getChildren().addAll(icono, texto);   
+        // Agrega esto justo antes de agregar el logo de la app
+        sb.getChildren().add(logo);
 
         // Botones
         String[][] items = {
@@ -139,7 +143,7 @@ public class App {
 
         sb.getChildren().addAll(spacer, new Separator(), stats, new Separator(), salir);
         return sb;
-    }
+    } 
 
     private VBox buildStatsPanel() {
         VBox stats = new VBox(4);
