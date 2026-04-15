@@ -37,7 +37,7 @@ public class PantallaInicio {
             imgTec.setPreserveRatio(true);
             
             // Cargar Logo ITS Libres
-            Image logo2 = new Image(getClass().getResourceAsStream("/logo_itslibres.png"));
+            Image logo2 = new Image(getClass().getResourceAsStream("/logo-tec.png"));
             imgLibres.setImage(logo2);
             imgLibres.setFitHeight(70); 
             imgLibres.setPreserveRatio(true);
