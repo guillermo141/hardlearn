@@ -117,9 +117,9 @@ public class App {
         // Botones
         String[][] items = {
             {"inicio", "Inicio"},
-            {"deteccion", "Detectar seña"},
-            {"conversacion", "Conversar"},
-            {"puntaje", "Mi progreso"}
+            {"deteccion", "Abecedario"},
+            {"conversacion", "Completar Palabras"},
+            {"puntaje", "Conversacion"}
         };
 
         for (int i = 0; i < items.length; i++) {
