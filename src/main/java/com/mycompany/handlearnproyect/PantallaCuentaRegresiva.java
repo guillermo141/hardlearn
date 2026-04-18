@@ -8,6 +8,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.util.Duration;
+import javafx.scene.Group;
 
 public class PantallaCuentaRegresiva {
 
@@ -15,7 +16,6 @@ public class PantallaCuentaRegresiva {
     private Timeline timeline;
     private int segundosRestantes = 10;
 
-    // Nodos que se actualizan durante la animación
     private Label lblNumero;
     private Label lblMensaje;
     private Arc arco;
@@ -23,122 +23,76 @@ public class PantallaCuentaRegresiva {
     private Label lblListo;
     private Label lblSeccion;
 
-    // Guardamos a dónde navegar al terminar y al cancelar
     private String destinoPagina;
     private App app;
 
     public PantallaCuentaRegresiva(App app) {
         this.app = app;
 
-        root = new VBox(16);
+        root = new VBox(25);
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: transparent;");
+        root.setStyle("-fx-background-color: #0A0F1E;"); // Fondo sólido para ver mejor el contraste
         root.setVisible(false);
 
-        // Nombre de la sección
         lblSeccion = new Label("");
-        lblSeccion.setStyle(
-            "-fx-text-fill: #00D4AA;" +
-            "-fx-font-size: 13px;" +
-            "-fx-font-weight: bold;"
-        );
+        lblSeccion.setStyle("-fx-text-fill: #00D4AA; -fx-font-size: 14px; -fx-font-weight: bold;");
 
-        // Subtítulo
         Label lblSub = new Label("El juego comenzará en...");
-        lblSub.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 15px;");
+        lblSub.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 16px;");
 
-        // ── Anillo ────────────────────────────────────────────────────────
+        // --- ANILLO CON CORRECCIÓN GEOMÉTRICA ---
+        Group contenedorDibujo = new Group(); // Usamos Group para que no haya márgenes invisibles
         double radio = 70;
 
         Circle pista = new Circle(radio);
         pista.setFill(Color.TRANSPARENT);
         pista.setStroke(Color.web("#1A2235"));
-        pista.setStrokeWidth(10);
+        pista.setStrokeWidth(12);
+        // Forzamos el centro en 0,0
+        pista.setCenterX(0);
+        pista.setCenterY(0);
 
-        arco = new Arc(0, 0, radio, radio, 90, -360);
+        arco = new Arc();
+        arco.setCenterX(0); // Forzamos el centro exacto en 0
+        arco.setCenterY(0);
+        arco.setRadiusX(radio);
+        arco.setRadiusY(radio);
+        arco.setStartAngle(90);
+        arco.setLength(-360);
         arco.setType(ArcType.OPEN);
         arco.setFill(Color.TRANSPARENT);
         arco.setStroke(Color.web("#00D4AA"));
-        arco.setStrokeWidth(10);
+        arco.setStrokeWidth(12);
         arco.setStrokeLineCap(StrokeLineCap.ROUND);
 
         lblNumero = new Label("10");
-        lblNumero.setStyle(
-            "-fx-text-fill: white;" +
-            "-fx-font-size: 52px;" +
-            "-fx-font-weight: bold;"
-        );
+        lblNumero.setStyle("-fx-text-fill: white; -fx-font-size: 55px; -fx-font-weight: bold;");
+        // Ajuste manual para que el texto flote justo en medio del Group
+        lblNumero.setLayoutX(-35); 
+        lblNumero.setLayoutY(-40);
 
-        StackPane anillo = new StackPane(pista, arco, lblNumero);
-        anillo.setPrefSize(160, 160);
-        anillo.setMaxSize(160, 160);
+        contenedorDibujo.getChildren().addAll(pista, arco, lblNumero);
 
-        // Mensaje dinámico
+        // Ponemos el Group dentro de un StackPane para darle espacio
+        StackPane frame = new StackPane(contenedorDibujo);
+        frame.setPrefSize(200, 200);
+
         lblMensaje = new Label("Prepárate...");
-        lblMensaje.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 14px;");
+        lblMensaje.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 16px;");
 
-        // Badge "¡A jugar!" (oculto al inicio)
-        lblListo = new Label("¡A jugar!");
-        lblListo.setStyle(
-            "-fx-background-color: #00D4AA;" +
-            "-fx-text-fill: #0A0F1E;" +
-            "-fx-font-size: 18px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-padding: 12 32 12 32;" +
-            "-fx-background-radius: 10;"
-        );
+        lblListo = new Label("¡A JUGAR!");
+        lblListo.setStyle("-fx-background-color: #00D4AA; -fx-text-fill: #0A0F1E; -fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 15 40; -fx-background-radius: 12;");
         lblListo.setVisible(false);
 
-        // Botón cancelar
         btnCancelar = new Button("Cancelar");
-        btnCancelar.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-border-color: #1E2D45;" +
-            "-fx-border-radius: 8;" +
-            "-fx-background-radius: 8;" +
-            "-fx-text-fill: #8895B3;" +
-            "-fx-font-size: 13px;" +
-            "-fx-padding: 9 28 9 28;" +
-            "-fx-cursor: hand;"
-        );
-        btnCancelar.setOnMouseEntered(e -> btnCancelar.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-border-color: #FF6B35;" +
-            "-fx-border-radius: 8;" +
-            "-fx-background-radius: 8;" +
-            "-fx-text-fill: #FF6B35;" +
-            "-fx-font-size: 13px;" +
-            "-fx-padding: 9 28 9 28;" +
-            "-fx-cursor: hand;"
-        ));
-        btnCancelar.setOnMouseExited(e -> btnCancelar.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-border-color: #1E2D45;" +
-            "-fx-border-radius: 8;" +
-            "-fx-background-radius: 8;" +
-            "-fx-text-fill: #8895B3;" +
-            "-fx-font-size: 13px;" +
-            "-fx-padding: 9 28 9 28;" +
-            "-fx-cursor: hand;"
-        ));
+        btnCancelar.setStyle("-fx-background-color: transparent; -fx-border-color: #1E2D45; -fx-text-fill: #8895B3; -fx-border-radius: 8; -fx-padding: 10 30; -fx-cursor: hand;");
         btnCancelar.setOnAction(e -> cancelar());
 
-        root.getChildren().addAll(
-            lblSeccion, lblSub, anillo,
-            lblMensaje, lblListo, btnCancelar
-        );
+        root.getChildren().addAll(lblSeccion, lblSub, frame, lblMensaje, lblListo, btnCancelar);
     }
 
-    /**
-     * Llama este método antes de hacer visible la pantalla.
-     *
-     * @param nombreSeccion  Texto que se muestra arriba (ej. "DETECTAR SEÑA")
-     * @param destinoPagina  Clave de navegación al terminar (ej. "deteccion")
-     */
     public void preparar(String nombreSeccion, String destinoPagina) {
         this.destinoPagina = destinoPagina;
-
-        // Resetear estado visual
         segundosRestantes = 10;
         lblSeccion.setText(nombreSeccion.toUpperCase());
         lblNumero.setText("10");
@@ -149,65 +103,44 @@ public class PantallaCuentaRegresiva {
         arco.setStroke(Color.web("#00D4AA"));
         arco.setLength(-360);
 
-        // Iniciar cuenta regresiva
         if (timeline != null) timeline.stop();
-
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> tick()));
         timeline.setCycleCount(10);
         timeline.setOnFinished(e -> terminar());
         timeline.play();
     }
 
-    public void detener() {
-        if (timeline != null) timeline.stop();
-    }
-
-    public Parent getRoot() {
-        return root;
-    }
-
-    // ── Lógica interna ────────────────────────────────────────────────────
-
     private void tick() {
         segundosRestantes--;
         lblNumero.setText(String.valueOf(segundosRestantes));
+        
+        // Ajuste de posición del texto si es un solo dígito para que no se mueva
+        if(segundosRestantes < 10) lblNumero.setLayoutX(-15);
 
-        // Actualizar arco
         double proporcion = (double) segundosRestantes / 10;
         arco.setLength(-360 * proporcion);
 
-        // Color según urgencia
-        if (segundosRestantes <= 3) {
-            arco.setStroke(Color.web("#FF6B35")); // rojo/naranja
-        } else if (segundosRestantes <= 6) {
-            arco.setStroke(Color.web("#EF9F27")); // amarillo
-        } else {
-            arco.setStroke(Color.web("#00D4AA")); // verde
-        }
-
-        // Mensaje dinámico
-        if (segundosRestantes <= 1)      
-            lblMensaje.setText("¡Ahora!");
-        else if (segundosRestantes <= 3) 
-            lblMensaje.setText("¡Ya casi!");
-        else                             
-            lblMensaje.setText("Prepárate...");
+        if (segundosRestantes <= 3) arco.setStroke(Color.web("#FF6B35"));
+        else if (segundosRestantes <= 6) arco.setStroke(Color.web("#EF9F27"));
+        else arco.setStroke(Color.web("#00D4AA"));
     }
 
     private void terminar() {
         lblNumero.setText("✓");
+        lblNumero.setLayoutX(-20);
         lblMensaje.setVisible(false);
         btnCancelar.setVisible(false);
         lblListo.setVisible(true);
 
-        // Pequeña pausa antes de navegar
-        PauseTransition pausa = new PauseTransition(Duration.millis(800));
+        PauseTransition pausa = new PauseTransition(Duration.millis(1000));
         pausa.setOnFinished(e -> app.navegarA(destinoPagina));
         pausa.play();
     }
 
     private void cancelar() {
-        detener();
+        if (timeline != null) timeline.stop();
         app.navegarA("inicio");
     }
+
+    public Parent getRoot() { return root; }
 }
