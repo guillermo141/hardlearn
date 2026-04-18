@@ -99,27 +99,33 @@ public class App {
         sb.setPrefWidth(260);
         sb.setPadding(new Insets(20, 15, 18, 15));
         sb.setStyle("-fx-background-color:#111827; -fx-border-color:#1E2D45; -fx-border-width:0 1 0 0;");
- 
-        HBox logo = new HBox(15);
-        logo.setAlignment(Pos.CENTER_LEFT);
-        logo.setPadding(new Insets(10, 0, 30, 10));
- 
-        Label icono = new Label("👋");
-        icono.setStyle("-fx-font-size: 24;");
- 
-        Label texto = new Label("HAND-LEARN");
-        texto.setStyle("-fx-font-family:'Segoe UI Bold', 'Arial'; -fx-font-size: 24; -fx-text-fill:#00D4AA; -fx-letter-spacing: 1px; -fx-effect: dropshadow(gaussian, rgba(0, 212, 170, 0.5), 10, 0, 0, 0);");
- 
-        logo.getChildren().addAll(icono, texto);
-        sb.getChildren().add(logo);
- 
-        // ── CAMBIO: los botones del menú ahora llaman a mostrarCuenta() ──
-        // Solo "Inicio" navega directo, los demás pasan por la cuenta regresiva
+
+        // --- LOGO TIPO STACK VERTICAL ---
+        // El "-25" hará que la palabra de abajo suba hasta casi la mitad de la de arriba
+        VBox logoContainer = new VBox(-25); 
+        logoContainer.setAlignment(Pos.CENTER_LEFT);
+        logoContainer.setPadding(new Insets(10, 0, 40, 15));
+
+        // Estilo con tamaño aumentado a 45 para que se vea imponente
+        String estiloTexto = "-fx-font-family:'Segoe UI Bold'; -fx-font-size: 45; -fx-text-fill:#00D4AA; -fx-font-weight: bold; -fx-line-spacing: 0;";
+
+        Label labelHand = new Label("HAND");
+        labelHand.setStyle(estiloTexto);
+
+        Label labelLearn = new Label("LEARN");
+        labelLearn.setStyle(estiloTexto);
+        // Opcional: un poco de transparencia al de abajo si quieres efecto de encimado
+        // labelLearn.setOpacity(0.8); 
+
+        logoContainer.getChildren().addAll(labelHand, labelLearn);
+        
+        sb.getChildren().add(logoContainer);
+        
         String[][] items = {
-            {"inicio",      "Inicio"},
-            {"deteccion",   "Detectar seña"},
-            {"conversacion","Conversar"},
-            {"puntaje",     "Mi progreso"}
+        {"inicio",      "Inicio"},
+        {"deteccion",   "Detectar seña"},
+        {"abecedario",  "Abecedario"},        // Antes era "conversacion"
+        {"completar",   "Completar Palabras"} // Antes era "puntaje"
         };
  
         for (int i = 0; i < items.length; i++) {
