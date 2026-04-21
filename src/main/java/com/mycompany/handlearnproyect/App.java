@@ -123,7 +123,7 @@ public class App {
         
         String[][] items = {
         {"inicio",      "Inicio"},
-        {"deteccion",   "Detectar seña"},
+        {"deteccion",   "Conversación"},
         {"abecedario",  "Abecedario"},        // Antes era "conversacion"
         {"completar",   "Completar Palabras"} // Antes era "puntaje"
         };
