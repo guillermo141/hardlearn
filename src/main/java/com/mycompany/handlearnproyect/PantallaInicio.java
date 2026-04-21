@@ -28,30 +28,41 @@ public class PantallaInicio {
         // Inicializamos los ImageViews
         ImageView imgTec = new ImageView();
         ImageView imgLibres = new ImageView();
+        ImageView imgISC = new ImageView();
 
         try {
-            // Cargar Logo TecNM
+            // Logo TecNM
             Image logo1 = new Image(getClass().getResourceAsStream("/logo_tecnm.png"));
             imgTec.setImage(logo1);
-            imgTec.setFitHeight(70); // Tamaño visible pero discreto
+            imgTec.setFitHeight(70);
             imgTec.setPreserveRatio(true);
             
-            // Cargar Logo ITS Libres
+            // --- CORRECCIÓN AQUÍ: Agregamos la "/" al inicio ---
+            Image logo3 = new Image(getClass().getResourceAsStream("/ISC horizontal blanco.png"));
+            imgISC.setImage(logo3);
+            imgISC.setFitHeight(60); // Un poquito más pequeño para que no amontone el centro
+            imgISC.setPreserveRatio(true);
+            
+            // Logo ITS Libres
             Image logo2 = new Image(getClass().getResourceAsStream("/logo-tec.png"));
             imgLibres.setImage(logo2);
             imgLibres.setFitHeight(70); 
             imgLibres.setPreserveRatio(true);
             
         } catch (Exception e) {
-            System.out.println("Error al cargar logos institutional: " + e.getMessage());
+            // Esto te dirá exactamente qué falló en la consola
+            System.out.println("Error al cargar logos: " + e.getMessage());
+            e.printStackTrace(); 
         }
 
         // --- COLOCAR LOGOS EN LAS ORILLAS (BorderPane) ---
+        cabeceraLogos.setCenter(imgISC);  // Logo ISC al centro supereior CENTRO
         cabeceraLogos.setLeft(imgTec);    // Logo TecNM a la esquina superior IZQUIERDA
         cabeceraLogos.setRight(imgLibres); // Logo ITS Libres a la esquina superior DERECHA
 
         // Alineación interna para que se peguen a las orillas superiores
         BorderPane.setAlignment(imgTec, Pos.TOP_LEFT);
+        BorderPane.setAlignment(imgISC, Pos.TOP_CENTER);
         BorderPane.setAlignment(imgLibres, Pos.TOP_RIGHT);
 
 
@@ -61,11 +72,11 @@ public class PantallaInicio {
         VBox.setVgrow(cuerpo, javafx.scene.layout.Priority.ALWAYS); // Ocupa el espacio central restante
 
         // Crear el saludo central
-        Label saludo = new Label("¡Hola, Guillermo!");
+        Label saludo = new Label("¡Hola, Amigo!");
         saludo.setStyle("-fx-text-fill: white; -fx-font-size: 36; -fx-font-weight: bold; -fx-letter-spacing: 2px;");
 
         // Texto de instrucciones
-        Label instruccion = new Label("Selecciona 'Detectar seña' para comenzar a practicar.");
+        Label instruccion = new Label("Exprésate con tus manos. Pulsa 'Detectar seña' para iniciar.");
         instruccion.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 18; -fx-font-family: 'Segoe UI Semibold';");
 
         cuerpo.getChildren().addAll(saludo, instruccion);
