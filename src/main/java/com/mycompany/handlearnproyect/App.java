@@ -80,10 +80,23 @@ public class App {
                 Socket socket = new Socket("localhost", 5005);
                 BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String linea;
+                
                 while ((linea = entrada.readLine()) != null) {
                     final String senaRecibida = linea;
+                    
                     Platform.runLater(() -> {
-                        pantallaDeteccion.actualizarResultado(senaRecibida);
+                        // REVISIÓN DE PANTALLAS VISIBLES
+                        if (pantallaDeteccion.getRoot().isVisible()) {
+                            pantallaDeteccion.actualizarResultado(senaRecibida);
+                        } 
+                        // "Abecedario" usa la pantalla que llamamos pantallaConversacion
+                        else if (pantallaConversacion.getRoot().isVisible()) {
+                            pantallaConversacion.actualizarResultado(senaRecibida);
+                        }
+                        // "Completar Palabras" usa la pantalla que llamamos pantallaPuntaje
+                        else if (pantallaPuntaje.getRoot().isVisible()) {
+                            pantallaPuntaje.actualizarResultado(senaRecibida);
+                        }
                     });
                 }
             } catch (IOException e) {
