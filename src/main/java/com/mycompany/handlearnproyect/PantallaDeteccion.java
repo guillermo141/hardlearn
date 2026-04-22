@@ -48,8 +48,8 @@ public class PantallaDeteccion {
 
     // Este método lo llama la clase App cada vez que Python manda un dato
     public void actualizarResultado(String sena) {
-        labelSena.setText(sena);
-    }
+    labelSena.setText(sena); // O la lógica que uses para mostrar la letra
+}
 
     public Parent getRoot() {
         return root;
