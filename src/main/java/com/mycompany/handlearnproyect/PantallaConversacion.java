@@ -48,8 +48,7 @@ public class PantallaConversacion {
 
     // Este método lo llama la clase App cada vez que Python manda un dato
     public void actualizarResultado(String letra) {
-    // Si es abecedario, quizás solo quieres mostrar la letra actual o acumularla
-    labelFrase.setText(letra.toUpperCase()); 
+    labelFrase.setText(letra.toUpperCase());
 }
 
     public Parent getRoot() {
