@@ -14,7 +14,7 @@ public class PantallaCuentaRegresiva {
 
     private VBox root;
     private Timeline timeline;
-    private int segundosRestantes = 10;
+    private int segundosRestantes = 5;
 
     private Label lblNumero;
     private Label lblMensaje;
@@ -65,7 +65,7 @@ public class PantallaCuentaRegresiva {
         arco.setStrokeWidth(12);
         arco.setStrokeLineCap(StrokeLineCap.ROUND);
 
-        lblNumero = new Label("10");
+        lblNumero = new Label("5");
         lblNumero.setStyle("-fx-text-fill: white; -fx-font-size: 55px; -fx-font-weight: bold;");
         // Ajuste manual para que el texto flote justo en medio del Group
         lblNumero.setLayoutX(-35); 
@@ -80,7 +80,7 @@ public class PantallaCuentaRegresiva {
         lblMensaje = new Label("Prepárate...");
         lblMensaje.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 16px;");
 
-        lblListo = new Label("¡A JUGAR!");
+        lblListo = new Label("¡COMENZA!");
         lblListo.setStyle("-fx-background-color: #00D4AA; -fx-text-fill: #0A0F1E; -fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 15 40; -fx-background-radius: 12;");
         lblListo.setVisible(false);
 
@@ -93,9 +93,9 @@ public class PantallaCuentaRegresiva {
 
     public void preparar(String nombreSeccion, String destinoPagina) {
         this.destinoPagina = destinoPagina;
-        segundosRestantes = 10;
+        segundosRestantes = 5;
         lblSeccion.setText(nombreSeccion.toUpperCase());
-        lblNumero.setText("10");
+        lblNumero.setText("5");
         lblMensaje.setText("Prepárate...");
         lblMensaje.setVisible(true);
         lblListo.setVisible(false);
@@ -105,7 +105,7 @@ public class PantallaCuentaRegresiva {
 
         if (timeline != null) timeline.stop();
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> tick()));
-        timeline.setCycleCount(10);
+        timeline.setCycleCount(5);
         timeline.setOnFinished(e -> terminar());
         timeline.play();
     }
@@ -117,10 +117,10 @@ public class PantallaCuentaRegresiva {
         // Ajuste de posición del texto si es un solo dígito para que no se mueva
         if(segundosRestantes < 10) lblNumero.setLayoutX(-15);
 
-        double proporcion = (double) segundosRestantes / 10;
+        double proporcion = (double) segundosRestantes / 5;
         arco.setLength(-360 * proporcion);
 
-        if (segundosRestantes <= 3) arco.setStroke(Color.web("#FF6B35"));
+        if (segundosRestantes <= 2) arco.setStroke(Color.web("#FF6B35"));
         else if (segundosRestantes <= 6) arco.setStroke(Color.web("#EF9F27"));
         else arco.setStroke(Color.web("#00D4AA"));
     }
