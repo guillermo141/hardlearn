@@ -10,7 +10,7 @@ import javafx.scene.layout.*;
 
 public class PantallaConversacion {
     private VBox root;
-    private Label labelSena;
+    private Label labelFrase;
 
     public PantallaConversacion (App app) {
         root = new VBox(20);
@@ -39,17 +39,18 @@ public class PantallaConversacion {
         areaCamara.getChildren().add(placeholder);
 
         // Etiqueta donde se mostrará la letra detectada
-        labelSena = new Label("Esperando...");
-        labelSena.setStyle("-fx-text-fill: #00D4AA; -fx-font-size: 60; -fx-font-family: 'Courier New'; -fx-font-weight: bold;");
+        labelFrase = new Label("Esperando...");
+        labelFrase.setStyle("-fx-text-fill: #00D4AA; -fx-font-size: 60; -fx-font-family: 'Courier New'; -fx-font-weight: bold;");
 
-        root.getChildren().addAll(titulo, areaCamara, labelSena);
+        root.getChildren().addAll(titulo, areaCamara, labelFrase);
         root.setVisible(false);
     }
 
     // Este método lo llama la clase App cada vez que Python manda un dato
-    public void actualizarResultado(String sena) {
-        labelSena.setText(sena);
-    }
+    public void actualizarResultado(String letra) {
+    // Si es abecedario, quizás solo quieres mostrar la letra actual o acumularla
+    labelFrase.setText(letra.toUpperCase()); 
+}
 
     public Parent getRoot() {
         return root;
