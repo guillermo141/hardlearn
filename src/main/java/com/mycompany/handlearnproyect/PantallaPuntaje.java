@@ -47,10 +47,10 @@ public class PantallaPuntaje {
     }
 
     // Este método lo llama la clase App cada vez que Python manda un dato
-    public void actualizarResultado(String sena) {
+    // Asegúrate de que esta clase tenga una variable llamada 'labelSena'
+        public void actualizarResultado(String sena) {
         labelSena.setText(sena);
-    }
-
+}
     public Parent getRoot() {
         return root;
     }
