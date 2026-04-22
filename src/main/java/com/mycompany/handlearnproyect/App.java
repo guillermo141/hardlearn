@@ -74,39 +74,44 @@ public class App {
     }
  
     // --- SISTEMA DE COMUNICACIÓN CON PYTHON (sin cambios) ---
-    public void conectarConPython() {
-        Thread hiloEscucha = new Thread(() -> {
-            try {
-                Socket socket = new Socket("localhost", 5005);
-                BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String linea;
+    // Busca este método en tu App.java y reemplázalo
+public void conectarConPython() {
+    Thread hiloEscucha = new Thread(() -> {
+        try {
+            Socket socket = new Socket("localhost", 5005);
+            BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String linea;
+            
+            while ((linea = entrada.readLine()) != null) {
+                final String senaRecibida = linea;
                 
-                while ((linea = entrada.readLine()) != null) {
-                    final String senaRecibida = linea;
-                    
-                    Platform.runLater(() -> {
-                        // REVISIÓN DE PANTALLAS VISIBLES
-                        if (pantallaDeteccion.getRoot().isVisible()) {
-                            pantallaDeteccion.actualizarResultado(senaRecibida);
-                        } 
-                        // "Abecedario" usa la pantalla que llamamos pantallaConversacion
-                        else if (pantallaConversacion.getRoot().isVisible()) {
-                            pantallaConversacion.actualizarResultado(senaRecibida);
-                        }
-                        // "Completar Palabras" usa la pantalla que llamamos pantallaPuntaje
-                        else if (pantallaPuntaje.getRoot().isVisible()) {
-                            pantallaPuntaje.actualizarResultado(senaRecibida);
-                        }
-                    });
-                }
-            } catch (IOException e) {
-                System.out.println("Esperando servidor Python...");
+                Platform.runLater(() -> {
+                    // LOG PARA DEPURACIÓN (Verás esto en la parte de abajo de NetBeans)
+                    System.out.println("Dato recibido: " + senaRecibida);
+
+                    // 1. Si estamos en Abecedario (que usa pantallaConversacion)
+                    if (pantallaConversacion.getRoot().isVisible()) {
+                        String dato = senaRecibida.replace("[L]", "").replace("[P]", "");
+                        pantallaConversacion.actualizarResultado(dato);
+                    } 
+                    // 2. Si estamos en Completar Palabras (que usa pantallaPuntaje)
+                    else if (pantallaPuntaje.getRoot().isVisible()) {
+                        String dato = senaRecibida.replace("[P]", "").replace("[L]", "");
+                        pantallaPuntaje.actualizarResultado(dato);
+                    }
+                    // 3. Si estamos en Conversación (que usa pantallaDeteccion)
+                    else if (pantallaDeteccion.getRoot().isVisible()) {
+                        pantallaDeteccion.actualizarResultado(senaRecibida);
+                    }
+                });
             }
-        });
-        hiloEscucha.setDaemon(true);
-        hiloEscucha.start();
-    }
- 
+        } catch (IOException e) {
+            System.out.println("Error de conexión: " + e.getMessage());
+        }
+    });
+    hiloEscucha.setDaemon(true);
+    hiloEscucha.start();
+} 
     private VBox buildSidebar() {
         VBox sb = new VBox(15);
         sb.setPrefWidth(260);
@@ -244,34 +249,30 @@ public class App {
     // navegarA() sin cambios — sigue siendo llamado por PantallaCuentaRegresiva
     // al terminar la cuenta, y por el botón Inicio directamente.
     public void navegarA(String pagina) {
-        pantallaInicio.getRoot().setVisible(false);
-        pantallaDeteccion.getRoot().setVisible(false);
-        pantallaConversacion.getRoot().setVisible(false);
-        pantallaPuntaje.getRoot().setVisible(false);
-        pantallaCuenta.getRoot().setVisible(false);  // <-- NUEVO: ocultar cuenta también
- 
-        String[] keys = {"inicio", "deteccion", "conversacion", "puntaje"};
-        for (int i = 0; i < keys.length; i++) {
-            if (keys[i].equals(pagina)) {
-                navBtns[i].setStyle("-fx-background-color:#00D4AA; -fx-background-radius:10; -fx-text-fill:#0A0F1E; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
-            } else {
-                navBtns[i].setStyle("-fx-background-color:transparent; -fx-text-fill:#8895B3; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
-            }
-        }
- 
-        switch (pagina) {
-            case "inicio":
-                pantallaInicio.getRoot().setVisible(true);
-                break;
-            case "deteccion":
-                pantallaDeteccion.getRoot().setVisible(true);
-                break;
-            case "conversacion":
-                pantallaConversacion.getRoot().setVisible(true);
-                break;
-            case "puntaje":
-                pantallaPuntaje.getRoot().setVisible(true);
-                break;
+    // Ocultamos todas primero
+    pantallaInicio.getRoot().setVisible(false);
+    pantallaDeteccion.getRoot().setVisible(false);
+    pantallaConversacion.getRoot().setVisible(false);
+    pantallaPuntaje.getRoot().setVisible(false);
+    pantallaCuenta.getRoot().setVisible(false);
+
+    // IMPORTANTE: Estos nombres deben ser iguales a los de tu arreglo 'items'
+    String[] keys = {"inicio", "deteccion", "abecedario", "completar"};
+    
+    for (int i = 0; i < keys.length; i++) {
+        if (keys[i].equals(pagina)) {
+            navBtns[i].setStyle("-fx-background-color:#00D4AA; -fx-background-radius:10; -fx-text-fill:#0A0F1E; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
+        } else {
+            navBtns[i].setStyle("-fx-background-color:transparent; -fx-text-fill:#8895B3; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
         }
     }
+
+    // Activamos la pantalla correspondiente
+    switch (pagina) {
+        case "inicio":     pantallaInicio.getRoot().setVisible(true); break;
+        case "deteccion":  pantallaDeteccion.getRoot().setVisible(true); break;
+        case "abecedario": pantallaConversacion.getRoot().setVisible(true); break;
+        case "completar":  pantallaPuntaje.getRoot().setVisible(true); break;
+    }
+}
 }
