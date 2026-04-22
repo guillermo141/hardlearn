@@ -48,8 +48,9 @@ public class PantallaPuntaje {
 
     // Este método lo llama la clase App cada vez que Python manda un dato
     // Asegúrate de que esta clase tenga una variable llamada 'labelSena'
-        public void actualizarResultado(String sena) {
-        labelSena.setText(sena);
+        public void actualizarResultado(String palabra) {
+        labelSena.setText(palabra);
+        if(palabra.length() > 8) labelSena.setStyle("-fx-font-size: 40; -fx-text-fill: #00D4AA;");
 }
     public Parent getRoot() {
         return root;
