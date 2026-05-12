@@ -14,15 +14,15 @@ public class App {
  
     private final Stage stage;
     private StackPane contentArea;
-    private Button[] navBtns = new Button[4];
+    // CORRECCIÓN 1: Cambiamos a tamaño 5 porque agregamos "Colores"
+    private Button[] navBtns = new Button[5];
  
-    // Clases de las pantallas
     private PantallaInicio pantallaInicio;
     private PantallaDeteccion pantallaDeteccion;
     private PantallaConversacion pantallaConversacion;
     private PantallaPuntaje pantallaPuntaje;
- 
-    // ── NUEVO: pantalla de cuenta regresiva ──────────────────────────────
+    private PantallaColores pantallaColores;
+    private String puntosActuales = "0";
     private PantallaCuentaRegresiva pantallaCuenta;
  
     public App(Stage stage) {
@@ -34,13 +34,12 @@ public class App {
         root.setStyle("-fx-background-color:#0A0F1E;");
  
         // 1. Inicializar pantallas
-        pantallaInicio      = new PantallaInicio(this);
-        pantallaDeteccion   = new PantallaDeteccion(this);
+        pantallaInicio       = new PantallaInicio(this);
+        pantallaDeteccion    = new PantallaDeteccion(this);
         pantallaConversacion = new PantallaConversacion(this);
-        pantallaPuntaje     = new PantallaPuntaje(this);
- 
-        // ── NUEVO ────────────────────────────────────────────────────────
-        pantallaCuenta = new PantallaCuentaRegresiva(this);
+        pantallaPuntaje      = new PantallaPuntaje(this);
+        pantallaColores      = new PantallaColores(this);
+        pantallaCuenta       = new PantallaCuentaRegresiva(this);
  
         VBox sidebar = buildSidebar();
  
@@ -48,14 +47,14 @@ public class App {
         contentArea.setStyle("-fx-background-color:#0A0F1E;");
         HBox.setHgrow(contentArea, Priority.ALWAYS);
  
-        // 2. Agregar raíces al contenedor principal
-        //    ── NUEVO: agrega pantallaCuenta también ──
+        // 2. Agregar raíces al contenedor
         contentArea.getChildren().addAll(
             pantallaPuntaje.getRoot(),
             pantallaConversacion.getRoot(),
             pantallaDeteccion.getRoot(),
             pantallaInicio.getRoot(),
-            pantallaCuenta.getRoot()   // <-- NUEVO
+            pantallaCuenta.getRoot(),
+            pantallaColores.getRoot()
         );
  
         root.getChildren().addAll(sidebar, contentArea);
@@ -68,211 +67,129 @@ public class App {
         stage.centerOnScreen();
         stage.show();
  
-        // 3. Iniciar navegación y conexión con Python
         navegarA("inicio");
         conectarConPython();
     }
  
-    // --- SISTEMA DE COMUNICACIÓN CON PYTHON (sin cambios) ---
-    // Busca este método en tu App.java y reemplázalo
-public void conectarConPython() {
-    Thread hiloEscucha = new Thread(() -> {
-        try {
-            Socket socket = new Socket("localhost", 5005);
-            BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String linea;
-            
-            while ((linea = entrada.readLine()) != null) {
-                final String senaRecibida = linea;
+    public void conectarConPython() {
+        Thread hiloEscucha = new Thread(() -> {
+            try {
+                Socket socket = new Socket("localhost", 5005);
+                BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String linea;
                 
-                Platform.runLater(() -> {
-                    // LOG PARA DEPURACIÓN (Verás esto en la parte de abajo de NetBeans)
-                    System.out.println("Dato recibido: " + senaRecibida);
-
-                    // 1. Si estamos en Abecedario (que usa pantallaConversacion)
-                    if (pantallaConversacion.getRoot().isVisible()) {
-                        String dato = senaRecibida.replace("[L]", "").replace("[P]", "");
-                        pantallaConversacion.actualizarResultado(dato);
-                    } 
-                    // 2. Si estamos en Completar Palabras (que usa pantallaPuntaje)
-                    else if (pantallaPuntaje.getRoot().isVisible()) {
-                        String dato = senaRecibida.replace("[P]", "").replace("[L]", "");
-                        pantallaPuntaje.actualizarResultado(dato);
-                    }
-                    // 3. Si estamos en Conversación (que usa pantallaDeteccion)
-                    else if (pantallaDeteccion.getRoot().isVisible()) {
-                        pantallaDeteccion.actualizarResultado(senaRecibida);
-                    }
-                });
+                while ((linea = entrada.readLine()) != null) {
+                    final String dato = linea;
+                    Platform.runLater(() -> {
+                        if (dato.startsWith("PUNTOS:")) {
+                            this.puntosActuales = dato.replace("PUNTOS:", "");
+                        } else if (dato.startsWith("[C]")) {
+                            if (pantallaColores != null && pantallaColores.getRoot().isVisible()) {
+                                pantallaColores.actualizarResultado(dato.replace("[C]", ""));
+                            }
+                        } else if (pantallaPuntaje.getRoot().isVisible()) {
+                            pantallaPuntaje.actualizarResultado(dato.replace("[P]", ""));
+                        } else if (pantallaConversacion.getRoot().isVisible()) {
+                            pantallaConversacion.actualizarResultado(dato.replace("[L]", ""));
+                        }
+                    });
+                }
+            } catch (IOException e) {
+                System.out.println("Servidor Python no detectado.");
             }
-        } catch (IOException e) {
-            System.out.println("Error de conexión: " + e.getMessage());
-        }
-    });
-    hiloEscucha.setDaemon(true);
-    hiloEscucha.start();
-} 
+        });
+        hiloEscucha.setDaemon(true);
+        hiloEscucha.start();
+    }
+
     private VBox buildSidebar() {
         VBox sb = new VBox(15);
         sb.setPrefWidth(260);
         sb.setPadding(new Insets(20, 15, 18, 15));
         sb.setStyle("-fx-background-color:#111827; -fx-border-color:#1E2D45; -fx-border-width:0 1 0 0;");
 
-        // --- LOGO TIPO STACK VERTICAL ---
-        // El "-25" hará que la palabra de abajo suba hasta casi la mitad de la de arriba
         VBox logoContainer = new VBox(-25); 
         logoContainer.setAlignment(Pos.CENTER_LEFT);
         logoContainer.setPadding(new Insets(10, 0, 40, 15));
 
-        // Estilo con tamaño aumentado a 45 para que se vea imponente
-        String estiloTexto = "-fx-font-family:'Segoe UI Bold'; -fx-font-size: 45; -fx-text-fill:#00D4AA; -fx-font-weight: bold; -fx-line-spacing: 0;";
+        String estiloTexto = "-fx-font-family:'Segoe UI Bold'; -fx-font-size: 45; -fx-text-fill:#00D4AA; -fx-font-weight: bold;";
 
         Label labelHand = new Label("HAND");
         labelHand.setStyle(estiloTexto);
-
         Label labelLearn = new Label("LEARN");
         labelLearn.setStyle(estiloTexto);
-        // Opcional: un poco de transparencia al de abajo si quieres efecto de encimado
-        // labelLearn.setOpacity(0.8); 
 
         logoContainer.getChildren().addAll(labelHand, labelLearn);
-        
         sb.getChildren().add(logoContainer);
         
+        // CORRECCIÓN 2: El arreglo de items ahora tiene 5 elementos
         String[][] items = {
-        {"inicio",      "Inicio"},
-        {"deteccion",   "Conversación"},
-        {"abecedario",  "Abecedario"},        // Antes era "conversacion"
-        {"completar",   "Completar Palabras"} // Antes era "puntaje"
+            {"inicio",      "Inicio"},
+            {"deteccion",   "Conversación"},
+            {"abecedario",  "Abecedario"},
+            {"completar",   "Completar Palabras"},
+            {"colores",     "Colores"}
         };
- 
+
         for (int i = 0; i < items.length; i++) {
-            final String key    = items[i][0];
+            final String key = items[i][0];
             final String nombre = items[i][1];
             Button btn = crearNavBtn(nombre);
- 
-            if (key.equals("inicio")) {
-                // Inicio va directo, sin cuenta regresiva
-                btn.setOnAction(e -> navegarA("inicio"));
-            } else {
-                // Las demás secciones pasan por la cuenta regresiva
-                btn.setOnAction(e -> mostrarCuenta(nombre, key));
-            }
- 
-            navBtns[i] = btn;
+            btn.setOnAction(e -> navegarA(key)); 
+
+            navBtns[i] = btn; // Aquí era donde tronaba si el tamaño era 4
             sb.getChildren().add(btn);
         }
- 
+
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
- 
-        VBox stats = buildStatsPanel();
- 
+
+        Button btnEstadisticas = new Button("Ver Progreso");
+        btnEstadisticas.setMaxWidth(Double.MAX_VALUE);
+        btnEstadisticas.setStyle("-fx-background-color: #1A2235; -fx-text-fill: #00D4AA; -fx-border-color: #00D4AA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-weight: bold; -fx-padding: 12; -fx-cursor: hand;");
+        btnEstadisticas.setOnAction(e -> PantallaEstadisticas.mostrar(this.puntosActuales));
+
         Button salir = new Button("Salir");
         salir.setMaxWidth(Double.MAX_VALUE);
         salir.setStyle("-fx-background-color:transparent; -fx-border-color:#FF6B35; -fx-border-radius:10; -fx-text-fill:#FF6B35; -fx-font-weight:bold; -fx-padding:10; -fx-cursor:hand;");
         salir.setOnAction(e -> Platform.exit());
- 
-        sb.getChildren().addAll(spacer, new Separator(), stats, new Separator(), salir);
+
+        sb.getChildren().addAll(spacer, new Separator(), btnEstadisticas, new Separator(), salir);
         return sb;
-    }
- 
-    /**
-     * ── NUEVO MÉTODO ─────────────────────────────────────────────────────
-     * Muestra la cuenta regresiva antes de entrar a una sección.
-     *
-     * @param nombreSeccion  Texto visible en la pantalla (ej. "Detectar seña")
-     * @param destinoPagina  Clave de navegación al terminar (ej. "deteccion")
-     */
-    private void mostrarCuenta(String nombreSeccion, String destinoPagina) {
-        // Ocultar todo
-        pantallaInicio.getRoot().setVisible(false);
-        pantallaDeteccion.getRoot().setVisible(false);
-        pantallaConversacion.getRoot().setVisible(false);
-        pantallaPuntaje.getRoot().setVisible(false);
- 
-        // Resaltar el botón correspondiente en el sidebar
-        String[] keys = {"inicio", "deteccion", "conversacion", "puntaje"};
-        for (int i = 0; i < keys.length; i++) {
-            if (keys[i].equals(destinoPagina)) {
-                navBtns[i].setStyle("-fx-background-color:#00D4AA; -fx-background-radius:10; -fx-text-fill:#0A0F1E; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
-            } else {
-                navBtns[i].setStyle("-fx-background-color:transparent; -fx-text-fill:#8895B3; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
-            }
-        }
- 
-        // Mostrar y arrancar la cuenta regresiva
-        pantallaCuenta.getRoot().setVisible(true);
-        pantallaCuenta.preparar(nombreSeccion, destinoPagina);
-    }
- 
-    private VBox buildStatsPanel() {
-        VBox stats = new VBox(4);
-        stats.setPadding(new Insets(12));
-        stats.setStyle("-fx-background-color:#1A2235; -fx-background-radius:12;");
- 
-        Label lp = new Label("Puntos totales");
-        lp.setStyle("-fx-text-fill:#8895B3; -fx-font-size:10; -fx-font-weight:bold;");
-        Label vp = new Label("1,240");
-        vp.setStyle("-fx-font-family:'Courier New'; -fx-font-size:18; -fx-font-weight:bold; -fx-text-fill:#00D4AA;");
- 
-        stats.getChildren().addAll(lp, vp);
-        return stats;
     }
  
     private Button crearNavBtn(String texto) {
         Button b = new Button(texto);
         b.setMaxWidth(Double.MAX_VALUE);
         b.setAlignment(Pos.CENTER_LEFT);
- 
-        String estiloNormal = "-fx-background-color:transparent; -fx-background-radius:10; -fx-text-fill:#8895B3; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14; -fx-cursor:hand;";
-        String estiloHover  = "-fx-background-color:rgba(0, 212, 170, 0.1); -fx-background-radius:10; -fx-text-fill:#00D4AA; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14; -fx-cursor:hand;";
- 
-        b.setStyle(estiloNormal);
- 
-        b.setOnMouseEntered(e -> {
-            if (!b.getStyle().contains("-fx-background-color:#00D4AA")) {
-                b.setStyle(estiloHover);
-                b.setTranslateX(10);
-            }
-        });
-        b.setOnMouseExited(e -> {
-            if (!b.getStyle().contains("-fx-background-color:#00D4AA")) {
-                b.setStyle(estiloNormal);
-                b.setTranslateX(0);
-            }
-        });
- 
+        b.setStyle("-fx-background-color:transparent; -fx-background-radius:10; -fx-text-fill:#8895B3; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14; -fx-cursor:hand;");
         return b;
     }
  
-    // navegarA() sin cambios — sigue siendo llamado por PantallaCuentaRegresiva
-    // al terminar la cuenta, y por el botón Inicio directamente.
     public void navegarA(String pagina) {
-    // Ocultamos todas primero
-    pantallaInicio.getRoot().setVisible(false);
-    pantallaDeteccion.getRoot().setVisible(false);
-    pantallaConversacion.getRoot().setVisible(false);
-    pantallaPuntaje.getRoot().setVisible(false);
-    pantallaCuenta.getRoot().setVisible(false);
+        pantallaInicio.getRoot().setVisible(false);
+        pantallaDeteccion.getRoot().setVisible(false);
+        pantallaConversacion.getRoot().setVisible(false);
+        pantallaPuntaje.getRoot().setVisible(false);
+        if (pantallaColores != null) pantallaColores.getRoot().setVisible(false);
+        if (pantallaCuenta != null) pantallaCuenta.getRoot().setVisible(false);
 
-    // IMPORTANTE: Estos nombres deben ser iguales a los de tu arreglo 'items'
-    String[] keys = {"inicio", "deteccion", "abecedario", "completar"};
-    
-    for (int i = 0; i < keys.length; i++) {
-        if (keys[i].equals(pagina)) {
-            navBtns[i].setStyle("-fx-background-color:#00D4AA; -fx-background-radius:10; -fx-text-fill:#0A0F1E; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
-        } else {
-            navBtns[i].setStyle("-fx-background-color:transparent; -fx-text-fill:#8895B3; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
+        // CORRECCIÓN 3: Actualizamos las llaves de navegación a 5
+        String[] keys = {"inicio", "deteccion", "abecedario", "completar", "colores"};
+        for (int i = 0; i < keys.length; i++) {
+            if (keys[i].equals(pagina)) {
+                navBtns[i].setStyle("-fx-background-color:#00D4AA; -fx-background-radius:10; -fx-text-fill:#0A0F1E; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
+            } else {
+                navBtns[i].setStyle("-fx-background-color:transparent; -fx-text-fill:#8895B3; -fx-font-size:13; -fx-font-weight:bold; -fx-padding:11 14;");
+            }
+        }
+
+        switch (pagina) {
+            case "inicio":      pantallaInicio.getRoot().setVisible(true); break;
+            case "deteccion":   pantallaDeteccion.getRoot().setVisible(true); break;
+            case "abecedario":  pantallaConversacion.getRoot().setVisible(true); break;
+            case "completar":   pantallaPuntaje.getRoot().setVisible(true); break;
+            case "colores":     pantallaColores.getRoot().setVisible(true); break;
         }
     }
-
-    // Activamos la pantalla correspondiente
-    switch (pagina) {
-        case "inicio":     pantallaInicio.getRoot().setVisible(true); break;
-        case "deteccion":  pantallaDeteccion.getRoot().setVisible(true); break;
-        case "abecedario": pantallaConversacion.getRoot().setVisible(true); break;
-        case "completar":  pantallaPuntaje.getRoot().setVisible(true); break;
-    }
-}
 }
