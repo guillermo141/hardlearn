@@ -37,14 +37,13 @@ public class PantallaInicio {
             imgTec.setFitHeight(70);
             imgTec.setPreserveRatio(true);
             
-            // --- CORRECCIÓN AQUÍ: Agregamos la "/" al inicio ---
             Image logo3 = new Image(getClass().getResourceAsStream("/ISC horizontal blanco.png"));
             imgISC.setImage(logo3);
             imgISC.setFitHeight(60); // Un poquito más pequeño para que no amontone el centro
             imgISC.setPreserveRatio(true);
             
             // Logo ITS Libres
-            Image logo2 = new Image(getClass().getResourceAsStream("/logo-tec.png"));
+            Image logo2 = new Image(getClass().getResourceAsStream("/logo_transparente.png"));
             imgLibres.setImage(logo2);
             imgLibres.setFitHeight(70); 
             imgLibres.setPreserveRatio(true);
