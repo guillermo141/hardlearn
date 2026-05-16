@@ -6,6 +6,7 @@ package com.mycompany.handlearnproyect;
 
 public class Launcher {
     public static void main(String[] args) {
+        // Simplemente redirige al Main
         Main.main(args);
     }
 }
