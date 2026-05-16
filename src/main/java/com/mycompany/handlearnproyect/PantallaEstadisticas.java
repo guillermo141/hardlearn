@@ -4,36 +4,37 @@
  */
 package com.mycompany.handlearnproyect;
 
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javax.swing.*;
+import java.awt.*;
 
 public class PantallaEstadisticas {
-    public static void mostrar(String puntos) {
-        Stage ventana = new Stage();
-        
-        // Bloquea la ventana principal hasta que se cierre esta
-        ventana.initModality(Modality.APPLICATION_MODAL);
-        ventana.setTitle("Mi Progreso");
 
-        VBox layout = new VBox(10);
-        layout.setAlignment(Pos.CENTER);
-        layout.setStyle("-fx-background-color: #0A0F1E; -fx-padding: 20; -fx-alignment: center; " +
-                        "-fx-border-color: #00D4AA; -fx-border-width: 2; -fx-border-radius: 10;");
+    public static void mostrar(JFrame parent, String puntos) {
+        JDialog ventana = new JDialog(parent, "Mi Progreso", true);
+        ventana.setSize(300, 200);
+        ventana.setLocationRelativeTo(parent);
 
-        Label txt = new Label("PUNTOS ACUMULADOS");
-        txt.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 12; -fx-font-weight: bold;");
+        JPanel layout = new JPanel(new GridBagLayout());
+        layout.setBackground(new Color(10, 15, 30));
+        layout.setBorder(BorderFactory.createLineBorder(new Color(0, 212, 170), 2));
 
-        Label num = new Label(puntos);
-        num.setStyle("-fx-text-fill: #00D4AA; -fx-font-size: 40; -fx-font-weight: bold; -fx-font-family: 'Courier New';");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        layout.getChildren().addAll(txt, num);
-        
-        Scene escena = new Scene(layout, 280, 180);
-        ventana.setScene(escena);
-        ventana.show();
+        JLabel titulo = new JLabel("PUNTOS TOTALES");
+        titulo.setForeground(new Color(136, 149, 179));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        gbc.gridy = 0;
+        layout.add(titulo, gbc);
+
+        JLabel valor = new JLabel(puntos);
+        valor.setForeground(new Color(0, 212, 170));
+        valor.setFont(new Font("Courier New", Font.BOLD, 50));
+        gbc.gridy = 1;
+        layout.add(valor, gbc);
+
+        ventana.add(layout);
+        ventana.setVisible(true);
     }
 }
