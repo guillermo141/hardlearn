@@ -4,23 +4,18 @@
  */
 package com.mycompany.handlearnproyect;
 
+import javax.swing.SwingUtilities;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
-
-public class Main extends Application {
-
-    @Override
-    public void start(Stage primaryStage) {
-        // Creamos la instancia de tu clase App y le pasamos el Stage
-        App app = new App(primaryStage);
-        
-        // Llamamos al método que construimos para armar la interfaz
-        app.mostrar();
-    }
-
+public class Main {
     public static void main(String[] args) {
-        // Este es el punto de entrada que busca NetBeans
-        launch(args);
+        // En Swing, lanzamos la aplicación así para que sea segura entre hilos
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Creamos la instancia de tu App (la versión Swing)
+                new App(); 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
