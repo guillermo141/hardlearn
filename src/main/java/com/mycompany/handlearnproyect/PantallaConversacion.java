@@ -1,57 +1,66 @@
 package com.mycompany.handlearnproyect;
 
-import javafx.util.Duration;
-import javafx.animation.FadeTransition;
-import javafx.animation.Animation;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javax.swing.*;
+import java.awt.*;
+import javax.swing.border.LineBorder;
 
-public class PantallaConversacion {
-    private VBox root;
-    private Label labelFrase;
+public class PantallaConversacion extends JPanel {
 
-    public PantallaConversacion (App app) {
-        root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #0A0F1E;");
+    private JTextArea areaTexto;
+    private JPanel areaCamara;
 
-        Label titulo = new Label("MÓDULO DE DETECCIÓN EN TIEMPO REAL");
-        titulo.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 14; -fx-font-weight: bold;");
+    public PantallaConversacion() {
+        // Configuración del panel (Fondo oscuro #0A0F1E)
+        this.setBackground(new Color(10, 15, 30));
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
 
-        // Área visual (Simulación de cámara)
-        StackPane areaCamara = new StackPane();
-        areaCamara.setPrefSize(640, 480);
-        areaCamara.setMaxSize(640, 480);
-        areaCamara.setStyle("-fx-background-color: #111827; -fx-border-color: #00D4AA; -fx-border-radius: 15; -fx-background-radius: 15; -fx-border-width: 2;");
+        // 1. Título del Módulo
+        JLabel titulo = new JLabel("MÓDULO DE CONVERSACIÓN (LSM)");
+        titulo.setForeground(new Color(136, 149, 179)); // #8895B3
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        gbc.gridy = 0;
+        this.add(titulo, gbc);
+
+        // 2. Recuadro de la Cámara (Donde se visualiza la seña)
+        areaCamara = new JPanel();
+        areaCamara.setPreferredSize(new Dimension(640, 480));
+        areaCamara.setBackground(new Color(17, 24, 39)); // #111827
+        areaCamara.setBorder(new LineBorder(new Color(0, 212, 170), 2, true)); // Borde Turquesa
+        gbc.gridy = 1;
+        this.add(areaCamara, gbc);
+
+        // 3. Área de visualización de texto (Traducción)
+        areaTexto = new JTextArea(2, 20);
+        areaTexto.setEditable(false);
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+        areaTexto.setBackground(new Color(10, 15, 30));
+        areaTexto.setForeground(new Color(0, 212, 170)); // #00D4AA
+        areaTexto.setFont(new Font("Segoe UI Semibold", Font.BOLD, 32));
+        areaTexto.setText("Traducción en tiempo real...");
         
-        // EN PantallaDeteccion.java, DEBAJO DE areaCamara.setStyle:
-        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(1.5), areaCamara);
-        ft.setFromValue(0.5);
-        ft.setToValue(1.0);
-        ft.setCycleCount(javafx.animation.Animation.INDEFINITE);
-        ft.setAutoReverse(true);
-        ft.play();
+        // Scroll invisible para que el texto fluya si es largo
+        JScrollPane scroll = new JScrollPane(areaTexto);
+        scroll.setBorder(null);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setPreferredSize(new Dimension(640, 100));
         
-        Label placeholder = new Label("conectando a pyhton...");
-        placeholder.setStyle("-fx-text-fill: #1E2D45; -fx-font-size: 20;");
-        areaCamara.getChildren().add(placeholder);
-
-        // Etiqueta donde se mostrará la letra detectada
-        labelFrase = new Label("Esperando...");
-        labelFrase.setStyle("-fx-text-fill: #00D4AA; -fx-font-size: 60; -fx-font-family: 'Courier New'; -fx-font-weight: bold;");
-
-        root.getChildren().addAll(titulo, areaCamara, labelFrase);
-        root.setVisible(false);
+        gbc.gridy = 2;
+        this.add(scroll, gbc);
     }
 
-    // Este método lo llama la clase App cada vez que Python manda un dato
-    public void actualizarResultado(String letra) {
-    labelFrase.setText(letra.toUpperCase());
-}
-
-    public Parent getRoot() {
-        return root;
+    /**
+     * Método para actualizar el texto desde la clase App
+     * Se activa cuando Python envía el prefijo correspondiente
+     */
+    public void actualizar(String textoDetectado) {
+        areaTexto.setText(textoDetectado);
+        // Aseguramos que se vea el cambio inmediatamente
+        this.revalidate();
+        this.repaint();
     }
 }
