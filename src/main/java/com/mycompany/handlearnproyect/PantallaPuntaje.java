@@ -1,58 +1,47 @@
 package com.mycompany.handlearnproyect;
 
-import javafx.util.Duration;
-import javafx.animation.FadeTransition;
-import javafx.animation.Animation;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javax.swing.*;
+import java.awt.*;
+import javax.swing.border.LineBorder;
 
-public class PantallaPuntaje {
-    private VBox root;
-    private Label labelSena;
+public class PantallaPuntaje extends JPanel {
 
-    public PantallaPuntaje (App app) {
-        root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #0A0F1E;");
+    private JLabel labelPalabra;
+    private JPanel areaCamara;
 
-        Label titulo = new Label("MÓDULO DE DETECCIÓN EN TIEMPO REAL");
-        titulo.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 14; -fx-font-weight: bold;");
+    public PantallaPuntaje() {
+        this.setBackground(new Color(10, 15, 30)); // #0A0F1E
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
 
-        // Área visual (Simulación de cámara)
-        StackPane areaCamara = new StackPane();
-        areaCamara.setPrefSize(640, 480);
-        areaCamara.setMaxSize(640, 480);
-        areaCamara.setStyle("-fx-background-color: #111827; -fx-border-color: #00D4AA; -fx-border-radius: 15; -fx-background-radius: 15; -fx-border-width: 2;");
-        
-        // EN PantallaDeteccion.java, DEBAJO DE areaCamara.setStyle:
-        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(1.5), areaCamara);
-        ft.setFromValue(0.5);
-        ft.setToValue(1.0);
-        ft.setCycleCount(javafx.animation.Animation.INDEFINITE);
-        ft.setAutoReverse(true);
-        ft.play();
-        
-        Label placeholder = new Label("conectando a pyhton...");
-        placeholder.setStyle("-fx-text-fill: #1E2D45; -fx-font-size: 20;");
-        areaCamara.getChildren().add(placeholder);
+        // 1. Título
+        JLabel titulo = new JLabel("MÓDULO: COMPLETAR PALABRAS");
+        titulo.setForeground(new Color(136, 149, 179)); // #8895B3
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        gbc.gridy = 0;
+        this.add(titulo, gbc);
 
-        // Etiqueta donde se mostrará la letra detectada
-        labelSena = new Label("Esperando...");
-        labelSena.setStyle("-fx-text-fill: #00D4AA; -fx-font-size: 60; -fx-font-family: 'Courier New'; -fx-font-weight: bold;");
+        // 2. Área de la Cámara
+        areaCamara = new JPanel();
+        areaCamara.setPreferredSize(new Dimension(640, 480));
+        areaCamara.setBackground(new Color(17, 24, 39)); // #111827
+        areaCamara.setBorder(new LineBorder(new Color(0, 212, 170), 2, true));
+        gbc.gridy = 1;
+        this.add(areaCamara, gbc);
 
-        root.getChildren().addAll(titulo, areaCamara, labelSena);
-        root.setVisible(false);
+        // 3. Resultado de la Palabra
+        labelPalabra = new JLabel("Formando palabra...");
+        labelPalabra.setForeground(new Color(0, 212, 170)); // #00D4AA
+        labelPalabra.setFont(new Font("Segoe UI Bold", Font.BOLD, 50));
+        gbc.gridy = 2;
+        this.add(labelPalabra, gbc);
     }
 
-    // Este método lo llama la clase App cada vez que Python manda un dato
-    // Asegúrate de que esta clase tenga una variable llamada 'labelSena'
-        public void actualizarResultado(String palabra) {
-        labelSena.setText(palabra);
-        if(palabra.length() > 8) labelSena.setStyle("-fx-font-size: 40; -fx-text-fill: #00D4AA;");
-}
-    public Parent getRoot() {
-        return root;
+    public void actualizar(String texto) {
+        labelPalabra.setText(texto.toUpperCase());
+        this.revalidate();
+        this.repaint();
     }
 }
