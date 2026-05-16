@@ -1,57 +1,62 @@
 package com.mycompany.handlearnproyect;
 
-import javafx.util.Duration;
-import javafx.animation.FadeTransition;
-import javafx.animation.Animation;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javax.swing.*;
+import java.awt.*;
+import javax.swing.border.LineBorder;
 
-public class PantallaDeteccion {
-    private VBox root;
-    private Label labelSena;
+public class PantallaDeteccion extends JPanel {
 
-    public PantallaDeteccion(App app) {
-        root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #0A0F1E;");
+    private JTextArea areaTexto;
+    private JPanel areaCamara;
 
-        Label titulo = new Label("MÓDULO DE DETECCIÓN EN TIEMPO REAL");
-        titulo.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 14; -fx-font-weight: bold;");
+    public PantallaDeteccion() {
+        this.setBackground(new Color(10, 15, 30)); // #0A0F1E
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
 
-        // Área visual (Simulación de cámara)
-        StackPane areaCamara = new StackPane();
-        areaCamara.setPrefSize(640, 480);
-        areaCamara.setMaxSize(640, 480);
-        areaCamara.setStyle("-fx-background-color: #111827; -fx-border-color: #00D4AA; -fx-border-radius: 15; -fx-background-radius: 15; -fx-border-width: 2;");
+        // 1. Título
+        JLabel titulo = new JLabel("MÓDULO DE CONVERSACIÓN LIBRE");
+        titulo.setForeground(new Color(136, 149, 179)); // #8895B3
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        gbc.gridy = 0;
+        this.add(titulo, gbc);
+
+        // 2. Área de la Cámara
+        areaCamara = new JPanel();
+        areaCamara.setPreferredSize(new Dimension(640, 480));
+        areaCamara.setBackground(new Color(17, 24, 39)); // #111827
+        areaCamara.setBorder(new LineBorder(new Color(0, 212, 170), 2, true));
+        gbc.gridy = 1;
+        this.add(areaCamara, gbc);
+
+        // 3. Área de Texto (Para frases largas)
+        areaTexto = new JTextArea(2, 20);
+        areaTexto.setEditable(false);
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+        areaTexto.setBackground(new Color(10, 15, 30));
+        areaTexto.setForeground(new Color(0, 212, 170)); // #00D4AA
+        areaTexto.setFont(new Font("Segoe UI Semibold", Font.BOLD, 30));
         
-        // EN PantallaDeteccion.java, DEBAJO DE areaCamara.setStyle:
-        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(1.5), areaCamara);
-        ft.setFromValue(0.5);
-        ft.setToValue(1.0);
-        ft.setCycleCount(javafx.animation.Animation.INDEFINITE);
-        ft.setAutoReverse(true);
-        ft.play();
+        // Un scroll por si la frase es muy larga
+        JScrollPane scroll = new JScrollPane(areaTexto);
+        scroll.setBorder(null);
+        scroll.setPreferredSize(new Dimension(640, 80));
+        scroll.setBackground(new Color(10, 15, 30));
         
-        Label placeholder = new Label("conectando a pyhton...");
-        placeholder.setStyle("-fx-text-fill: #1E2D45; -fx-font-size: 20;");
-        areaCamara.getChildren().add(placeholder);
-
-        // Etiqueta donde se mostrará la letra detectada
-        labelSena = new Label("Esperando...");
-        labelSena.setStyle("-fx-text-fill: #00D4AA; -fx-font-size: 60; -fx-font-family: 'Courier New'; -fx-font-weight: bold;");
-
-        root.getChildren().addAll(titulo, areaCamara, labelSena);
-        root.setVisible(false);
+        gbc.gridy = 2;
+        this.add(scroll, gbc);
     }
 
-    // Este método lo llama la clase App cada vez que Python manda un dato
-    public void actualizarResultado(String sena) {
-    labelSena.setText(sena); // O la lógica que uses para mostrar la letra
-}
-
-    public Parent getRoot() {
-        return root;
+    /**
+     * Este método lo llamarás desde App.java cuando Python mande 
+     * texto de conversación general.
+     */
+    public void actualizar(String texto) {
+        areaTexto.setText(texto);
+        this.revalidate();
+        this.repaint();
     }
 }
