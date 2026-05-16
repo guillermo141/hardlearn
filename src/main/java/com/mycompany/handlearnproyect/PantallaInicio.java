@@ -1,101 +1,77 @@
 package com.mycompany.handlearnproyect;
 
-import javafx.animation.FadeTransition;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.util.Duration;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.net.URL;
 
-public class PantallaInicio {
-    private VBox root;
+public class PantallaInicio extends JPanel {
 
-    public PantallaInicio(App app) {
-        root = new VBox(20); // Espacio entre cabecera y cuerpo
-        root.setAlignment(Pos.TOP_CENTER); // Alineamos todo al inicio superior
-        root.setStyle("-fx-background-color: #0A0F1E;");
-        root.setPadding(new Insets(20)); // Padding general para que nada toque la orilla
+    public PantallaInicio() {
+        this.setBackground(new Color(10, 15, 30));
+        this.setLayout(new BorderLayout()); // BorderLayout es más estable para separar el techo del centro
 
-        // --- CONTENEDOR DE CABECERA (LOGOS EN LAS ORILLAS SUPERIORES) ---
-        BorderPane cabeceraLogos = new BorderPane();
-        cabeceraLogos.setMaxWidth(Double.MAX_VALUE); // Ocupa todo el ancho disponible
-        cabeceraLogos.setPadding(new Insets(10, 30, 0, 30)); // Padding interno (Arriba, Derecha, Abajo, Izquierda)
+        // --- 1. CABEZAL INSTITUCIONAL ---
+        JPanel panelCabezal = new JPanel(new GridLayout(1, 3));
+        panelCabezal.setOpaque(false);
+        
+        // Aumentamos el margen superior a 60 para que bajen un poco y no se vean "aplastados"
+        // El margen de 80 a los lados evita que se vean comprimidos contra las orillas
+        panelCabezal.setBorder(new EmptyBorder(40, 70, 40, 80)); 
 
-        // Inicializamos los ImageViews
-        ImageView imgTec = new ImageView();
-        ImageView imgLibres = new ImageView();
-        ImageView imgISC = new ImageView();
+        // Logo Izquierda (TecNM) - Tamaño balanceado
+        JPanel pnlIzquierda = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        pnlIzquierda.setOpaque(false);
+        pnlIzquierda.add(crearLogoLabel("/logo_tecnm.png", 130, 60));
 
-        try {
-            // Logo TecNM
-            Image logo1 = new Image(getClass().getResourceAsStream("/logo_tecnm.png"));
-            imgTec.setImage(logo1);
-            imgTec.setFitHeight(70);
-            imgTec.setPreserveRatio(true);
-            
-            Image logo3 = new Image(getClass().getResourceAsStream("/ISC horizontal blanco.png"));
-            imgISC.setImage(logo3);
-            imgISC.setFitHeight(60); // Un poquito más pequeño para que no amontone el centro
-            imgISC.setPreserveRatio(true);
-            
-            // Logo ITS Libres
-            Image logo2 = new Image(getClass().getResourceAsStream("/logo_transparente.png"));
-            imgLibres.setImage(logo2);
-            imgLibres.setFitHeight(70); 
-            imgLibres.setPreserveRatio(true);
-            
-        } catch (Exception e) {
-            // Esto te dirá exactamente qué falló en la consola
-            System.out.println("Error al cargar logos: " + e.getMessage());
-            e.printStackTrace(); 
+        // Logo Centro (Sistemas) - Un poco más pequeño para que no domine
+        JPanel pnlCentro = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        pnlCentro.setOpaque(false);
+        pnlCentro.add(crearLogoLabel("/ISC horizontal blanco.png", 140, 50));
+
+        // Logo Derecha (ITSS Libres) - Tamaño balanceado
+        JPanel pnlDerecha = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        pnlDerecha.setOpaque(false);
+        pnlDerecha.add(crearLogoLabel("/logo_transparente.png", 130, 60));
+
+        panelCabezal.add(pnlIzquierda);
+        panelCabezal.add(pnlCentro);
+        panelCabezal.add(pnlDerecha);
+
+        this.add(panelCabezal, BorderLayout.NORTH);
+
+        // --- 2. ÁREA CENTRAL (SALUDO) ---
+        JPanel panelCentral = new JPanel(new GridBagLayout());
+        panelCentral.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        
+        JLabel labelHola = new JLabel("¡Hola, Amigo!");
+        labelHola.setForeground(new Color(0, 212, 170));
+        labelHola.setFont(new Font("Segoe UI", Font.BOLD, 55));
+        
+        gbc.gridy = 0;
+        
+        gbc.insets = new Insets(-100, 0, 0, 0); 
+        panelCentral.add(labelHola, gbc);
+        
+        JLabel labelSub = new JLabel("Bienvenido a Hand Learn");
+        labelSub.setForeground(new Color(136, 149, 179));
+        labelSub.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 24));
+
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 0, 0); // Reset de margen para el subtítulo
+        panelCentral.add(labelSub, gbc);
+
+        this.add(panelCentral, BorderLayout.CENTER);    }
+
+    private JLabel crearLogoLabel(String ruta, int ancho, int alto) {
+        URL imgURL = getClass().getResource(ruta);
+        if (imgURL != null) {
+            ImageIcon icon = new ImageIcon(imgURL);
+            Image img = icon.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+            return new JLabel(new ImageIcon(img));
         }
-
-        // --- COLOCAR LOGOS EN LAS ORILLAS (BorderPane) ---
-        cabeceraLogos.setCenter(imgISC);  // Logo ISC al centro supereior CENTRO
-        cabeceraLogos.setLeft(imgTec);    // Logo TecNM a la esquina superior IZQUIERDA
-        cabeceraLogos.setRight(imgLibres); // Logo ITS Libres a la esquina superior DERECHA
-
-        // Alineación interna para que se peguen a las orillas superiores
-        BorderPane.setAlignment(imgTec, Pos.TOP_LEFT);
-        BorderPane.setAlignment(imgISC, Pos.TOP_CENTER);
-        BorderPane.setAlignment(imgLibres, Pos.TOP_RIGHT);
-
-
-        // --- CUERPO DE LA PANTALLA (SALUDO E INSTRUCCIONES) ---
-        VBox cuerpo = new VBox(30); // Espacio entre saludo e instrucciones
-        cuerpo.setAlignment(Pos.CENTER);
-        VBox.setVgrow(cuerpo, javafx.scene.layout.Priority.ALWAYS); // Ocupa el espacio central restante
-
-        // Crear el saludo central
-        Label saludo = new Label("¡Hola, Amigo!");
-        saludo.setStyle("-fx-text-fill: white; -fx-font-size: 36; -fx-font-weight: bold; -fx-letter-spacing: 2px;");
-
-        // Texto de instrucciones
-        Label instruccion = new Label("Exprésate con tus manos. Pulsa 'Detectar seña' para iniciar.");
-        instruccion.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 18; -fx-font-family: 'Segoe UI Semibold';");
-
-        cuerpo.getChildren().addAll(saludo, instruccion);
-
-
-        // --- AGREGAR TODO AL PANEL PRINCIPAL (root) ---
-        root.getChildren().addAll(cabeceraLogos, cuerpo);
-        root.setVisible(false);
-
-        // --- ANIMACIÓN DE ENTRADA SUAVE ---
-        // Animamos todo el root para que la cabecera aparezca elegantemente
-        root.setOpacity(0); // Empezamos invisible
-        FadeTransition ft = new FadeTransition(Duration.seconds(1.8), root);
-        ft.setFromValue(0);
-        ft.setToValue(1);
-        ft.play();
-    }
-
-    public Parent getRoot() {
-        return root;
+        return new JLabel(""); 
     }
 }
-
