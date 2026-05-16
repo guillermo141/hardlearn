@@ -1,39 +1,63 @@
 
 package com.mycompany.handlearnproyect;
 
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javax.swing.*;
+import java.awt.*;
+import javax.swing.border.LineBorder;
 
-public class PantallaColores {
-    private VBox root;
-    private Label labelColor;
+public class PantallaColores extends JPanel {
 
-    public PantallaColores(App app) {
-        root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #0A0F1E;");
+    private JLabel labelColor;
+    private JPanel areaCamara;
 
-        Label titulo = new Label("MÓDULO DE RECONOCIMIENTO DE COLORES");
-        titulo.setStyle("-fx-text-fill: #8895B3; -fx-font-size: 14; -fx-font-weight: bold;");
+    public PantallaColores() {
+        // Configuramos el panel principal (equivalente al VBox)
+        this.setBackground(new Color(10, 15, 30)); // #0A0F1E
+        this.setLayout(new GridBagLayout()); // Para centrar todo fácilmente
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
 
-        // Espacio para la cámara
-        StackPane areaCamara = new StackPane();
-        areaCamara.setPrefSize(640, 480);
-        areaCamara.setMaxSize(640, 480);
-        areaCamara.setStyle("-fx-background-color: #111827; -fx-border-color: #00D4AA; -fx-border-radius: 15; -fx-background-radius: 15; -fx-border-width: 2;");
+        // 1. Título
+        JLabel titulo = new JLabel("MÓDULO DE RECONOCIMIENTO DE COLORES");
+        titulo.setForeground(new Color(136, 149, 179)); // #8895B3
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        gbc.gridy = 0;
+        this.add(titulo, gbc);
 
-        labelColor = new Label("Esperando color...");
-        labelColor.setStyle("-fx-text-fill: #00D4AA; -fx-font-size: 50; -fx-font-family: 'Segoe UI Bold';");
+        // 2. Área de la Cámara (El recuadro donde Python proyecta)
+        areaCamara = new JPanel();
+        areaCamara.setPreferredSize(new Dimension(640, 480));
+        areaCamara.setBackground(new Color(17, 24, 39)); // #111827
+        areaCamara.setBorder(new LineBorder(new Color(0, 212, 170), 2, true)); // Borde Turquesa
+        gbc.gridy = 1;
+        this.add(areaCamara, gbc);
 
-        root.getChildren().addAll(titulo, areaCamara, labelColor);
-        root.setVisible(false);
+        // 3. Etiqueta de Resultado
+        labelColor = new JLabel("Esperando color...");
+        labelColor.setForeground(new Color(0, 212, 170)); // #00D4AA
+        labelColor.setFont(new Font("Segoe UI Semibold", Font.BOLD, 45));
+        gbc.gridy = 2;
+        this.add(labelColor, gbc);
     }
 
-    public void actualizarResultado(String color) {
-        labelColor.setText(color.toUpperCase());
+    /**
+     * Método que llamará App.java cuando reciba el dato "[C]" de Python
+     */
+    public void actualizar(String colorDetectado) {
+        // Swing requiere que actualicemos el texto así
+        labelColor.setText(colorDetectado.toUpperCase());
+        
+        // Efecto visual: Cambiar el color del texto según el nombre
+        String color = colorDetectado.toLowerCase();
+        if (color.contains("rojo")) labelColor.setForeground(Color.RED);
+        else if (color.contains("azul")) labelColor.setForeground(new Color(30, 144, 255));
+        else if (color.contains("verde")) labelColor.setForeground(Color.GREEN);
+        else if (color.contains("amarillo")) labelColor.setForeground(Color.YELLOW);
+        else labelColor.setForeground(new Color(0, 212, 170)); // Volver al turquesa original
+        
+        // Forzar a que la interfaz se repinte
+        this.revalidate();
+        this.repaint();
     }
-
-    public Parent getRoot() { return root; }
 }
