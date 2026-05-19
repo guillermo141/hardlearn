@@ -46,7 +46,7 @@ public class PantallaInicio extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         
-        JLabel labelHola = new JLabel("¡Hola!, ¿Cómo estas?");
+        JLabel labelHola = new JLabel("¡Hola!, ¿Cómo estás?");
         labelHola.setForeground(new Color(0, 212, 170));
         labelHola.setFont(new Font("Segoe UI", Font.BOLD, 55));
         
